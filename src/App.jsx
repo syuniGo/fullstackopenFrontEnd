@@ -52,12 +52,12 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<HomePage />}>
+        <Route path="/" element={<Exercises />}>
           {" "}
         </Route>
-        <Route path="/part2" element={<Exercises />}>
+        {/* <Route path="/part2" element={<Exercises />}>
           {" "}
-        </Route>
+        </Route> */}
       </Routes>
     </BrowserRouter>
   );

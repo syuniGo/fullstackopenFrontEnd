@@ -1,5 +1,5 @@
 import axios from 'axios'
-const baseUrl = `http://localhost:3001/`
+const baseUrl = `http://localhost:3001/api/`
 
 const getAll = (obj_type) => {
   const request = axios.get(baseUrl+obj_type)
@@ -11,14 +11,14 @@ const create = (obj_type, newObject) => {
   return request.then(response => response.data)
 }
 
-const update = (obj_type, id, newObject) => {
-  const request = axios.put(`${baseUrl+obj_type}/${id}`, newObject)
+const update = (obj_type, rid, newObject) => {
+  const request = axios.put(`${baseUrl+obj_type}/${rid}`, newObject)
   return request.then(response => response.data)
 }
 
-const deleteObj = (obj_type, id) => {
-  console.log('Deleting:', `${baseUrl}${obj_type}/${id}`)
-  const request = axios.delete(`${baseUrl+obj_type}/${id}`)
+const deleteObj = (obj_type, rid) => {
+  console.log('Deleting:', `${baseUrl}${obj_type}/${rid}`)
+  const request = axios.delete(`${baseUrl+obj_type}/${rid}`)
   return request.then(response => response.data)
 }
 

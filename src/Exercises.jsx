@@ -123,7 +123,8 @@ const E2 = (props) =>{
 const exercises = () => {
   return (
     <>
-      <RestCountries></RestCountries>
+      {/* <RestCountries></RestCountries> */}
+      <Phonebook></Phonebook>
     </>
   );
 };

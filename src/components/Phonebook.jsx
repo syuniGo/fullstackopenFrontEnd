@@ -94,7 +94,7 @@ const Notification = (props) => {
 }
 
 const Phonebook = () => {
-  const [persons, setPersons] = useState([]);
+  const [persons, setPersons] = useState(null);
   const [showPersons, setShowPersons] = useState(persons);
   const [newName, setNewName] = useState("");
   const [filterWords, setFilterWords] = useState("");
@@ -112,6 +112,10 @@ const Phonebook = () => {
       setNewPhoneNumber(returnedPersons[0].newPhoneNumber);
     });
   }, []);
+
+  if (!persons) {
+    return null
+  }
   console.log("render", persons.length, "persons");
 
   const addNewPerson = (event) => {
@@ -123,7 +127,7 @@ const Phonebook = () => {
         return;
       } else {
         dbjson_service
-          .update(obj_type, existingPerson.id, {
+          .update(obj_type, existingPerson.rid, {
             ...existingPerson,
             number: newPhoneNumber,
           })
@@ -132,10 +136,10 @@ const Phonebook = () => {
               person.id === existingPerson.id ? resp : person
             );
             setPersons(updatedPersons);
-            setShowPersons(updatedPersons);    
+            setShowPersons(updatedPersons);
           }).catch(err => {
-            console.log('error',err);
-            handleMsg( `${existingPerson.name} has already been removed from server`, 'error')
+            console.log('error', err);
+            handleMsg(`${existingPerson.name} has already been removed from server`, 'error')
           });
       }
       return;
@@ -146,11 +150,16 @@ const Phonebook = () => {
       number: newPhoneNumber,
     };
     dbjson_service.create(obj_type, phonebookObj).then((resp) => {
+      console.log('add', resp)
       setPersons([...persons, resp]);
       setShowPersons([...persons, resp]);
       setNewName("");
       handleMsg(`${resp.name} is Added`, 'success')
-    });
+    }).catch(err => {
+      console.log('err-----',err)
+      handleMsg(err.response.data.msg, 'error')
+    }
+    );
   };
 
   const addNewName = (event) => {
@@ -162,10 +171,19 @@ const Phonebook = () => {
   };
 
   const deleteObj = (obj_type, obj) => {
-    if(confirm(`Delete ${obj.name} `)){
-      dbjson_service.deleteObj(obj_type, obj.id).then((resp) => {
-        setPersons(persons.filter((e) => e.id != resp.id));
-        setShowPersons(showPersons.filter((e) => e.id != resp.id));
+    if (confirm(`Delete ${obj.name} `)) {
+      dbjson_service.deleteObj(obj_type, obj.rid).then((resp) => {
+        console.log(resp)
+        setPersons(persons.filter((e) => e.rid != resp.rid));
+        setShowPersons(showPersons.filter((e) => e.rid != resp.rid));
+      }).catch(error => {
+        // 检查是否是 404 错误
+        if (error.response && error.response.status === 404) {
+          alert(`Information of ${obj.name} id not found`)
+        } else {
+          // 处理其他错误
+          alert('Delete failed: ' + error.message)
+        }
       });
     }
     return
@@ -179,7 +197,7 @@ const Phonebook = () => {
     setShowPersons(newShow);
   };
 
-  
+
   // 显示成功消息
   const handleMsg = (msg, msgtype) => {
     setMessage({ text: msg, type: msgtype })
@@ -208,7 +226,7 @@ const Phonebook = () => {
       <h2>Numbers</h2>
       {showPersons.map((e) => {
         console.log("Phonebook component rendered");
-        return <Persons e={e} key={e.id} handleDelte={()=>deleteObj(obj_type, e)} />;
+        return <Persons e={e} key={e.id} handleDelte={() => deleteObj(obj_type, e)} />;
       })}
     </div>
   );
